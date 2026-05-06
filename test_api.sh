@@ -189,7 +189,7 @@ if [[ "$health_status" == "CURL_ERROR" ]]; then
   exit 1
 fi
 
-assert_http_and_json "GET /health" "GET" "/health" "200" "isinstance(data, dict) and data.get('status') == 'ok' and 'plugin' in data"
+assert_http_and_json "GET /health" "GET" "/health" "200" "isinstance(data, dict) and data.get('status') == 'ok' and 'plugin' in data and 'version' in data"
 assert_http_and_json "GET /status" "GET" "/status" "200" "isinstance(data, dict) and all(k in data for k in ['connected','login_status','login_username','uploads_total','downloads_total'])"
 assert_http_and_json "GET /searches (initial)" "GET" "/searches" "200" "isinstance(data.get('count'), int) and isinstance(data.get('items'), list)"
 assert_http_and_json "GET /uploads" "GET" "/uploads" "200" "data.get('direction') == 'uploads' and isinstance(data.get('items'), list) and isinstance(data.get('count'), int)"
@@ -218,7 +218,7 @@ assert_http_and_json "POST /search (empty query -> 400)" "POST" "/search" "400" 
 assert_http_and_json "POST /search (bad mode -> 400)" "POST" "/search" "400" "'error' in data" '{"query":"abc","mode":"invalid"}'
 assert_http_and_json "GET /unknown (-> 400)" "GET" "/unknown" "400" "'error' in data"
 
-assert_http_and_json "POST /rescan" "POST" "/rescan" "200" "isinstance(data, dict) and data.get('status') == 'ok' and 'plugin' in data"
+assert_http_and_json "POST /rescan" "POST" "/rescan" "200" "isinstance(data, dict) and data.get('status') == 'ok'"
 
 if [[ "$RUN_AUTH_REQUIRED_TESTS" -eq 1 ]]; then
   if [[ -z "$TOKEN" ]]; then

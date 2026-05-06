@@ -13,6 +13,7 @@ from pynicotine.pluginsystem import BasePlugin
 from pynicotine.slskmessages import UserStatus
 from pynicotine.transfers import TransferStatus
 
+VERSION = "1.1"
 
 class _PluginHTTPServer(ThreadingHTTPServer):
     daemon_threads = True
@@ -199,6 +200,7 @@ class Plugin(BasePlugin):
                     return {
                         "status": "ok",
                         "plugin": plugin.human_name,
+                        "version": VERSION
                     }
 
                 if route == "/status":
@@ -244,7 +246,6 @@ class Plugin(BasePlugin):
                     plugin.core.shares.rescan_shares()
                     return {
                         "status": "ok",
-                        "plugin": plugin.human_name,
                     }
 
                 if route == "/search":
