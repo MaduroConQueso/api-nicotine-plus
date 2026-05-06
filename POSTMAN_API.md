@@ -608,7 +608,27 @@ Queues one cached search result item by `token + index`.
 
 ---
 
-## 8.12 Unknown Route Behavior
+## 8.12 POST /rescan
+
+Rescan files 
+
+### Postman Request
+
+- Method: `POST`
+- URL: `{{baseUrl}}/rescan`
+- Auth headers: optional/required depending on `api_token`
+
+### 200 Response
+
+```json
+{
+  "status": "ok",
+  "plugin": "API Nicotine Plus"
+}
+```
+---
+
+## 8.13 Unknown Route Behavior
 
 Any unknown `GET` or `POST` path returns:
 

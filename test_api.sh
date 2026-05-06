@@ -218,6 +218,8 @@ assert_http_and_json "POST /search (empty query -> 400)" "POST" "/search" "400" 
 assert_http_and_json "POST /search (bad mode -> 400)" "POST" "/search" "400" "'error' in data" '{"query":"abc","mode":"invalid"}'
 assert_http_and_json "GET /unknown (-> 400)" "GET" "/unknown" "400" "'error' in data"
 
+assert_http_and_json "POST /rescan" "POST" "/rescan" "200" "isinstance(data, dict) and data.get('status') == 'ok' and 'plugin' in data"
+
 if [[ "$RUN_AUTH_REQUIRED_TESTS" -eq 1 ]]; then
   if [[ -z "$TOKEN" ]]; then
     fail "Auth required tests requested but no token provided (--token or API_TOKEN)"

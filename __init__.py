@@ -240,6 +240,13 @@ class Plugin(BasePlugin):
                 route = parsed.path
                 payload = self._read_json_body()
 
+                if route == "/rescan":
+                    plugin.core.shares.rescan_shares()
+                    return {
+                        "status": "ok",
+                        "plugin": plugin.human_name,
+                    }
+
                 if route == "/search":
                     query = str(payload.get("query", "")).strip()
                     mode = str(payload.get("mode", "global")).strip().lower()
