@@ -190,7 +190,8 @@ Returned by `/search/results`:
 ```json
 {
   "status": "ok",
-  "plugin": "API Nicotine Plus"
+  "plugin": "API Nicotine Plus",
+  "version": "1.0"
 }
 ```
 
@@ -380,12 +381,14 @@ Returns uploads list.
 - Query params:
   - `user` (string, optional)
   - `active_only` (bool-like string, optional)
+  - `sort_transfers` (bool-like string, optional, true by default)
 
 Examples:
 
 - `{{baseUrl}}/uploads`
 - `{{baseUrl}}/uploads?active_only=true`
 - `{{baseUrl}}/uploads?user=pepe&active_only=true`
+- `{{baseUrl}}/uploads?user=pepe&sort_transfers=false`
 
 ### 200 Response
 
@@ -412,12 +415,13 @@ Returns downloads list.
 - Query params:
   - `user` (string, optional)
   - `active_only` (bool-like string, optional)
-
+  - `sort_transfers` (bool-like string, optional, true by default)
 Examples:
 
 - `{{baseUrl}}/downloads`
 - `{{baseUrl}}/downloads?active_only=false`
 - `{{baseUrl}}/downloads?user=pepe&active_only=true`
+- `{{baseUrl}}/downloads?user=pepe&sort_transfers=false`
 
 ### 200 Response
 
@@ -610,8 +614,8 @@ Queues one cached search result item by `token + index`.
 
 ## 8.12 POST /rescan
 
-Rescan files 
-
+Queues a rescan of all shared files.
+ 
 ### Postman Request
 
 - Method: `POST`

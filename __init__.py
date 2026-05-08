@@ -13,8 +13,6 @@ from pynicotine.pluginsystem import BasePlugin
 from pynicotine.slskmessages import UserStatus
 from pynicotine.transfers import TransferStatus
 
-VERSION = "1.1"
-
 class _PluginHTTPServer(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
@@ -31,6 +29,8 @@ class Plugin(BasePlugin):
         TransferStatus.GETTING_STATUS,
         TransferStatus.TRANSFERRING,
     }
+
+    PLUGIN_VERSION = "1.2"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -154,7 +154,7 @@ class Plugin(BasePlugin):
         plugin = self
 
         class RestHandler(BaseHTTPRequestHandler):
-            server_version = "NicotinePlusPluginREST/1.0"
+            server_version = "NicotinePlusPluginREST/" + plugin.PLUGIN_VERSION
 
             def do_OPTIONS(self):
                 self.send_response(204)
@@ -200,7 +200,7 @@ class Plugin(BasePlugin):
                     return {
                         "status": "ok",
                         "plugin": plugin.human_name,
-                        "version": VERSION
+                        "version": plugin.PLUGIN_VERSION
                     }
 
                 if route == "/status":
@@ -219,11 +219,13 @@ class Plugin(BasePlugin):
                     direction = route.lstrip("/")
                     user = self._first(query, "user")
                     active_only = self._bool_param(query, "active_only", plugin.settings["default_active_only"])
+                    sort_transfers = self._bool_param(query, "sort_transfers", True)
                     return plugin._call_main_thread(
                         plugin._get_transfers,
                         direction,
                         user=user,
                         active_only=active_only,
+                        sort_transfers=sort_transfers
                     )
 
                 if route in {"/uploads/users", "/downloads/users"}:
@@ -243,7 +245,9 @@ class Plugin(BasePlugin):
                 payload = self._read_json_body()
 
                 if route == "/rescan":
-                    plugin.core.shares.rescan_shares()
+                    plugin._call_main_thread(
+                        plugin.core.shares.rescan_shares
+                    )
                     return {
                         "status": "ok",
                     }
@@ -723,7 +727,7 @@ class Plugin(BasePlugin):
             "progress_pct": progress,
         }
 
-    def _get_transfers(self, direction, user=None, active_only=True):
+    def _get_transfers(self, direction, user=None, active_only=True, sort_transfers=True):
         if direction not in {"uploads", "downloads"}:
             raise ValueError("direction must be uploads or downloads")
 
@@ -739,13 +743,14 @@ class Plugin(BasePlugin):
                 if item.status in self.ACTIVE_TRANSFER_STATUSES
             ]
 
-        transfer_objects.sort(
-            key=lambda item: (
-                item.username or "",
-                item.status or "",
-                item.virtual_path or "",
+        if sort_transfers:
+            transfer_objects.sort(
+                key=lambda item: (
+                    item.username or "",
+                    item.status or "",
+                    item.virtual_path or "",
+                )
             )
-        )
 
         items = [self._transfer_to_dict(item) for item in transfer_objects]
 
